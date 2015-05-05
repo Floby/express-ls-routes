@@ -35,6 +35,11 @@ class Express4RouterFixture
     @app._router.stack.push {name, route}
     this
 
+  withUse: (name) ->
+    route = undefined
+    @app._router.stack.push {name}
+    this
+
   build: -> @app
 
 
@@ -154,6 +159,17 @@ describe 'express-ls-routes', ->
         .build()
       expected = [
         'GET    /aPath'
+      ]
+      lsRoutes(app) req, null, ->
+        req.routes.should.eql expected
+    
+    it 'does not break when using other generic middlewares with .use()', ->
+      app = router
+        .withUse('logger')
+        .withRoute('get', '/myPath')
+        .build()
+      expected = [
+        'GET    /myPath'
       ]
       lsRoutes(app) req, null, ->
         req.routes.should.eql expected
